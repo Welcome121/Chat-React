@@ -1,34 +1,8 @@
 import appConfig from '../config.json'
 import { Box, Button, Text, TextField, Image } from '@skynexui/components'
-
-function GlobalStyle(){
-    return (
-        <style global jsx>{`
-          * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            list-style: none;
-          }
-          body {
-            font-family: 'Open Sans', sans-serif;
-          }
-          /* App fit Height */ 
-          html, body, #__next {
-            min-height: 100vh;
-            display: flex;
-            flex: 1;
-          }
-          #__next {
-            flex: 1;
-          }
-          #__next > * {
-            flex: 1;
-          }
-          /* ./App fit Height */ 
-        `}</style>
-      );
-}
+import React from 'react';
+import { useRouter } from 'next/router'
+import { allowedStatusCodes } from 'next/dist/lib/load-custom-routes';
 
 function Title(props){
     const Tag = props.tag || 'h1';
@@ -46,11 +20,14 @@ function Title(props){
     );
 }
 
-export default function PaginaInicial() {
-    const username = 'Welcome121';
+export default function InicialPage() {
+    //const username = 'Welcome121';
+    const [username, setUsername] = React.useState('alura')
+    const routing = useRouter();
+    let allowPhoto = false;
+
     return (
       <>
-        <GlobalStyle />
         <Box
           styleSheet={{
             display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -81,7 +58,17 @@ export default function PaginaInicial() {
                 display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
                 width: { xs: '100%', sm: '50%' }, textAlign: 'center', marginBottom: '32px',
               }}
+
+              onSubmit = {(events) => {
+                console.log("Alguem submeteu o form");
+                
+                //Impede que o evento padrão ocorra, no caso, o reload da página
+                events.preventDefault();
+
+                routing.push(`/chat?username=${username}`);
+              }}
             >
+
               <Title tag="h2">CHAT REACT</Title>
               <Text variant="body3" styleSheet={{ marginBottom: '32px', color: appConfig.theme.colors.primary["800"] }}>
                 {appConfig.phrase}
@@ -97,7 +84,25 @@ export default function PaginaInicial() {
                     backgroundColor: appConfig.theme.colors.neutrals["200"],
                   },
                 }}
-              />
+
+                placeholder = "Usuário github..."
+
+                onChange = {(event) => {
+                  console.log("Alguem alterou a caixa de texto")
+
+                  //local onde o valor esta armazenado
+                  const valor = event.target.value
+                  const NUM_MIN_CHARACTERS = 2
+
+                  if(valor.length || username.length > NUM_MIN_CHARACTERS) allowPhoto = true;
+                  else allowPhoto = false;
+
+                  //Trocando o valor da variavel username através do react
+                  if (allowPhoto) setUsername(valor);
+                  else setUsername('');
+                }}
+              /> 
+
               <Button
                 type='submit'
                 label='Entrar'
